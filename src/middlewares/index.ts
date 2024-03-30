@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getUserBySessionToken } from '@/services/user';
 import { get, merge } from 'lodash';
+import { getPost } from '@/services/post';
 
 export const isAuthenticated = async (
   req: Request,
@@ -56,6 +57,24 @@ export const isLogin = async (req: Request, res: Response, next: NextFunction) =
     const sessionToken = req.cookies['AUTH'];
 
     if (sessionToken) {
+      return res.sendStatus(403);
+    }
+
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(400);
+  }
+};
+
+export const isAuthor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const post = await getPost(id);
+
+    const currentUserId = get(req, 'identity.id') as string;
+
+    if (post.authorId !== currentUserId) {
       return res.sendStatus(403);
     }
 

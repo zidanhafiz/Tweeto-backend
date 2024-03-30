@@ -11,3 +11,8 @@ type Post = {
   authorId: string;
   tweet: string;
 };
+
+type UpdatedPost = {
+  tweet: string;
+  isEdit: boolean;
+};

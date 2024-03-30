@@ -44,3 +44,20 @@ export const insertPost = async (post: Post) => {
     data: post,
   });
 };
+
+export const deletePostById = async (id: string) => {
+  return await prisma.post.delete({
+    where: {
+      id,
+    },
+  });
+};
+
+export const updatePostById = async (id: string, data: UpdatedPost) => {
+  return await prisma.post.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};

@@ -1,8 +1,10 @@
 import {
+  deletePostById,
   findManyPost,
   findManyPostByUserId,
   findPostById,
   insertPost,
+  updatePostById,
 } from '@/repository/post';
 
 export const createPost = async (post: Post) => {
@@ -13,10 +15,18 @@ export const getAllPosts = async () => {
   return await findManyPost();
 };
 
-export const getPostById = async (id: string) => {
+export const getPost = async (id: string) => {
   return await findPostById(id);
 };
 
-export const getAllPostsByUserId = async (userId: string) => {
+export const getUserPosts = async (userId: string) => {
   return await findManyPostByUserId(userId);
+};
+
+export const deletePost = async (id: string) => {
+  return await deletePostById(id);
+};
+
+export const updatePost = async (id: string, data: UpdatedPost) => {
+  return await updatePostById(id, data);
 };
