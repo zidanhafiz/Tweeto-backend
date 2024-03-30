@@ -1,4 +1,4 @@
-import { createPost, getAllPosts } from '@/services/post';
+import { createPost, getAllPosts, getPostById } from '@/services/post';
 import { getUserBySessionToken } from '@/services/user';
 import { Router, Request, Response } from 'express';
 import { nanoid } from 'nanoid';
@@ -10,6 +10,22 @@ router.get('/', async (req: Request, res: Response) => {
     const posts = await getAllPosts();
 
     return res.status(200).send(posts);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(400);
+  }
+});
+
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const post = await getPostById(id);
+    if (!post) {
+      return res.sendStatus(404);
+    }
+
+    return res.status(200).send(post);
   } catch (error) {
     console.error(error);
     return res.sendStatus(400);

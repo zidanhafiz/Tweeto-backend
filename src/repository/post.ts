@@ -14,6 +14,23 @@ export const findManyPost = async () => {
   });
 };
 
+export const findPostById = async (id: string) => {
+  return await prisma.post.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+        },
+      },
+    },
+  });
+};
+
 export const findManyPostByUserId = async (userId: string) => {
   return await prisma.post.findUnique({
     where: {
