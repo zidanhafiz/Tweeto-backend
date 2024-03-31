@@ -3,41 +3,67 @@ import { createUser, getUserByEmail, updateUserById } from '@/services/user';
 import { authentication, random } from '@/helpers';
 import { isLogin } from '@/middlewares';
 import { nanoid } from 'nanoid';
+import multer from 'multer';
+import { uploadAvatar } from '@/repository/user';
 
 const router = Router();
-
-router.post('/register', isLogin, async (req: Request, res: Response) => {
-  try {
-    const { email, username, password } = req.body as User;
-
-    // if email, username or password are empty
-    if (!email || !username || !password) {
-      return res.sendStatus(400);
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error('Only image files are allowed.'));
     }
-
-    // check if user already exist
-    const isUserExist = await getUserByEmail(email);
-    if (isUserExist) {
-      return res.sendStatus(400);
-    }
-
-    // create user
-    const salt = random();
-    const id = nanoid();
-    const user = await createUser({
-      id,
-      username,
-      email,
-      salt,
-      password: authentication(salt, password),
-    });
-
-    return res.status(200).send(user);
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(500);
-  }
+    cb(null, true);
+  },
 });
+
+router.post(
+  '/register',
+  isLogin,
+  upload.single('avatar'),
+  async (req: Request, res: Response) => {
+    try {
+      const { email, username, password } = req.body as User;
+      const avatar = req.file;
+
+      // if email, username or password are empty
+      if (!email || !username || !password) {
+        return res.sendStatus(400);
+      }
+
+      // check if user already exist
+      const isUserExist = await getUserByEmail(email);
+      if (isUserExist) {
+        return res.sendStatus(400);
+      }
+
+      // create user
+      const salt = random();
+      const id = nanoid();
+
+      // upload avatar to firebase and get avatar data
+      const newAvatar = await uploadAvatar(avatar, id);
+
+      // create user
+      const user = await createUser({
+        id,
+        username,
+        email,
+        salt,
+        avatarId: newAvatar.id,
+        password: authentication(salt, password),
+      });
+
+      return res.status(200).send({
+        user,
+        avatar: newAvatar,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.sendStatus(500);
+    }
+  }
+);
 
 router.post('/login', isLogin, async (req: Request, res: Response) => {
   try {

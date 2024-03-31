@@ -16,10 +16,11 @@ datasource db {
 model Post {
   id        String   @id
   author    User     @relation(fields: [authorId], references: [id])
-  authorId  String   
+  authorId  String
   tweet     String   @db.Text
+  imgTweet  String?
   isEdit    Boolean  @default(false)
-  createdAt DateTime @default(now()) 
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
@@ -27,8 +28,17 @@ model User {
   id           String  @id
   email        String  @unique
   username     String  @unique
-  password     String?  
-  salt         String?  
+  avatar       Avatar? @relation(fields: [avatarId], references: [id])
+  password     String?
+  salt         String?
   sessionToken String? @unique
   posts        Post[]
+  avatarId     String?
+}
+
+model Avatar {
+  id   String @id
+  name String
+  url  String
+  User User[]
 }
