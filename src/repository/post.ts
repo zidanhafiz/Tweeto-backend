@@ -1,4 +1,4 @@
-import prisma from '@/db';
+import { prisma } from '@/db';
 
 export const findManyPost = async () => {
   return await prisma.post.findMany({
@@ -32,9 +32,12 @@ export const findPostById = async (id: string) => {
 };
 
 export const findManyPostByUserId = async (userId: string) => {
-  return await prisma.post.findUnique({
+  return await prisma.user.findUnique({
     where: {
-      authorId: userId,
+      id: userId,
+    },
+    include: {
+      posts: true,
     },
   });
 };
