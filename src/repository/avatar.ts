@@ -14,3 +14,11 @@ export const updateAvatarByid = async (id: string, data: Avatar) => {
     data,
   });
 };
+
+export const deleteAvatarById = async (id: string) => {
+  return await prisma.avatar.delete({
+    where: {
+      id,
+    },
+  });
+};

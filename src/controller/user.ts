@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { deleteUserById, getUserById, getUsers, updateUserById } from '@/services/user';
 import { isOwner, isUser } from '@/middlewares';
 import multer from 'multer';
-import { updateAvatar, uploadAvatar } from '@/services/avatar';
+import { createAvatar, deleteAvatar, uploadAvatar } from '@/services/avatar';
 import { deleteAllPosts } from '@/services/post';
 import { updateAvatarByid } from '@/repository/avatar';
 
@@ -31,12 +31,21 @@ router.get('/', async (req: Request, res: Response) => {
 router.delete('/:id', isOwner, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const user = await getUserById(id);
 
+    console.log(user);
+
+    // delete user's post and user's avatar
     await deleteAllPosts(id);
 
-    const user = await deleteUserById(id);
+    if (user.avatar.name !== 'profile.png') {
+      await deleteAvatar(user.avatar);
+    }
 
-    return res.status(200).send(user);
+    // delete user
+    const deletedUser = await deleteUserById(id);
+
+    return res.status(200).send(deletedUser);
   } catch (error) {
     console.error(error);
     return res.sendStatus(400);
@@ -59,6 +68,7 @@ router.patch(
       }
 
       const user = await getUserById(id);
+      let avatar = user.avatar;
 
       // if user doesn't exist
       if (!user) {
@@ -68,22 +78,29 @@ router.patch(
       // modified user's username
       user.username = username;
 
-      // Upload avatar to firebase
-      const avatar = await uploadAvatar(newAvatar, user.id);
+      if (newAvatar) {
+        // Upload avatar to firebase
+        avatar = await uploadAvatar(newAvatar, user.id);
 
-      // if avatar is not default update it to database
-      if (avatar.name !== 'profile.png') {
-        await updateAvatarByid(user.avatarId, avatar);
+        // if user's avatar is default insert into database
+        if (user.avatarId === 'Xy058vlSSKoLpZ3p7Keo5') {
+          await createAvatar(avatar);
+          console.log('created');
+        } else {
+          await updateAvatarByid(user.avatarId, avatar);
+          console.log('updated');
+        }
       }
 
       const newUser = {
         username,
+        avatarId: avatar.id,
       };
 
       const updatedUser = await updateUserById(id, newUser);
 
       return res.status(201).send({
-        updatedUser,
+        data: updatedUser,
         avatar,
       });
     } catch (error) {

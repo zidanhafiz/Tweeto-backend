@@ -43,7 +43,10 @@ router.post(
 
       // upload avatar to firebase and database then get avatar data
       const newAvatar = await uploadAvatar(avatar, id);
-      await createAvatar(newAvatar);
+
+      if (newAvatar.name !== 'profile.png') {
+        await createAvatar(newAvatar);
+      }
 
       // create user
       const user = await createUser({
