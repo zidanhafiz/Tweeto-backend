@@ -10,6 +10,7 @@ export const findManyPost = async () => {
           email: true,
         },
       },
+      tweetImg: true,
     },
   });
 };
@@ -27,6 +28,7 @@ export const findPostById = async (id: string) => {
           email: true,
         },
       },
+      tweetImg: true,
     },
   });
 };
@@ -45,6 +47,10 @@ export const findManyPostByUserId = async (userId: string) => {
 export const insertPost = async (post: Post) => {
   return await prisma.post.create({
     data: post,
+    include: {
+      tweetImg: true,
+      author: true,
+    },
   });
 };
 
@@ -65,10 +71,14 @@ export const deleteManyPosts = async (authorId: string) => {
 };
 
 export const updatePostById = async (id: string, data: UpdatedPost) => {
+  console.log(data);
   return await prisma.post.update({
     where: {
       id,
     },
     data,
+    include: {
+      tweetImg: true,
+    },
   });
 };

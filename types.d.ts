@@ -11,13 +11,18 @@ type Post = {
   id: string;
   authorId: string;
   tweet: string;
-  imgTweet?: string;
+  tweetImg?: {
+    create: TweetImg;
+  };
 };
 
 type UpdatedPost = {
   tweet: string;
-  imgTweet?: string;
   isEdit: boolean;
+  tweetImg?: {
+    update?: TweetImg;
+    create?: TweetImg;
+  };
 };
 
 type Avatar = {
@@ -28,4 +33,10 @@ type Avatar = {
 
 type UpdatedUser = {
   username: string;
+};
+
+type TweetImg = {
+  id: string;
+  name: string;
+  url: string;
 };

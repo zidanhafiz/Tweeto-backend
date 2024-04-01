@@ -8,9 +8,19 @@ import {
 } from '@/services/post';
 import { getUserBySessionToken } from '@/services/user';
 import { Router, Request, Response } from 'express';
+import multer from 'multer';
 import { nanoid } from 'nanoid';
 
 const router = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error('Only image files are allowed.'));
+    }
+    cb(null, true);
+  },
+});
 
 router.get('/', async (req: Request, res: Response) => {
   try {
@@ -39,9 +49,10 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', upload.single('image'), async (req: Request, res: Response) => {
   try {
     const { tweet } = req.body as Post;
+    const image = req.file;
 
     if (!tweet) {
       return res.sendStatus(500);
@@ -64,7 +75,7 @@ router.post('/', async (req: Request, res: Response) => {
       tweet,
     };
 
-    const postedTweet = await createPost(post);
+    const postedTweet = await createPost(post, image);
     return res.status(201).send(postedTweet);
   } catch (error) {
     console.error(error);
@@ -84,23 +95,29 @@ router.delete('/:id', isAuthor, async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/:id', isAuthor, async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { tweet } = req.body;
+router.patch(
+  '/:id',
+  isAuthor,
+  upload.single('image'),
+  async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { tweet } = req.body;
+      const image = req.file;
 
-    const post = {
-      tweet,
-      isEdit: true,
-    };
+      const post: UpdatedPost = {
+        tweet,
+        isEdit: true,
+      };
 
-    const updatedPost = await updatePost(id, post);
+      const updatedPost = await updatePost(id, post, image);
 
-    return res.status(201).send(updatedPost);
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(400);
+      return res.status(201).send(updatedPost);
+    } catch (error) {
+      console.error(error);
+      return res.sendStatus(400);
+    }
   }
-});
+);
 
 export default router;
