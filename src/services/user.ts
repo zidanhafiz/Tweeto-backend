@@ -32,6 +32,6 @@ export const deleteUserById = async (id: string) => {
   return await deleteUser(id);
 };
 
-export const updateUserById = async (id: string, data: User) => {
+export const updateUserById = async (id: string, data: UpdatedUser) => {
   return await updateUser(id, data);
 };

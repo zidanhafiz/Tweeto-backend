@@ -4,7 +4,7 @@ import { authentication, random } from '@/helpers';
 import { isLogin } from '@/middlewares';
 import { nanoid } from 'nanoid';
 import multer from 'multer';
-import { uploadAvatar } from '@/repository/user';
+import { createAvatar, uploadAvatar } from '@/services/avatar';
 
 const router = Router();
 const upload = multer({
@@ -41,8 +41,9 @@ router.post(
       const salt = random();
       const id = nanoid();
 
-      // upload avatar to firebase and get avatar data
+      // upload avatar to firebase and database then get avatar data
       const newAvatar = await uploadAvatar(avatar, id);
+      await createAvatar(newAvatar);
 
       // create user
       const user = await createUser({

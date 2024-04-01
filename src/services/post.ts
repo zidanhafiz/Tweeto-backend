@@ -1,4 +1,5 @@
 import {
+  deleteManyPosts,
   deletePostById,
   findManyPost,
   findManyPostByUserId,
@@ -25,6 +26,10 @@ export const getUserPosts = async (userId: string) => {
 
 export const deletePost = async (id: string) => {
   return await deletePostById(id);
+};
+
+export const deleteAllPosts = async (userId: string) => {
+  return await deleteManyPosts(userId);
 };
 
 export const updatePost = async (id: string, data: UpdatedPost) => {

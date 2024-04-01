@@ -84,3 +84,19 @@ export const isAuthor = async (req: Request, res: Response, next: NextFunction) 
     return res.sendStatus(400);
   }
 };
+
+export const isUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const currentUserId = get(req, 'identity.id') as string;
+
+    if (currentUserId !== id) {
+      return res.sendStatus(403);
+    }
+
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(400);
+  }
+};

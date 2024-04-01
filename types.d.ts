@@ -21,7 +21,11 @@ type UpdatedPost = {
 };
 
 type Avatar = {
-  id?: string;
-  name?: string;
-  url?: string;
+  id: string;
+  name: string;
+  url: string;
+};
+
+type UpdatedUser = {
+  username: string;
 };
