@@ -72,6 +72,10 @@ export const isAuthor = async (req: Request, res: Response, next: NextFunction) 
     const { id } = req.params;
     const post = await getPost(id);
 
+    if (!post) {
+      return res.sendStatus(404);
+    }
+
     const currentUserId = get(req, 'identity.id') as string;
 
     if (post.authorId !== currentUserId) {

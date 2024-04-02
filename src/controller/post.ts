@@ -1,4 +1,5 @@
 import { isAuthor } from '@/middlewares';
+import { deleteTweetImg } from '@/repository/tweet-img';
 import {
   createPost,
   deletePost,
@@ -86,7 +87,11 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
 router.delete('/:id', isAuthor, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const post = await getPost(id);
+
     const deletedPost = await deletePost(id);
+
+    await deleteTweetImg(post.tweetImg);
 
     return res.status(201).send(deletedPost);
   } catch (error) {

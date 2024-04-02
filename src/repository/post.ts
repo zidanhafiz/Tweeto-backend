@@ -2,6 +2,9 @@ import { prisma } from '@/db';
 
 export const findManyPost = async () => {
   return await prisma.post.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
     include: {
       author: {
         select: {
@@ -59,6 +62,9 @@ export const deletePostById = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      tweetImg: true,
+    },
   });
 };
 
@@ -71,7 +77,6 @@ export const deleteManyPosts = async (authorId: string) => {
 };
 
 export const updatePostById = async (id: string, data: UpdatedPost) => {
-  console.log(data);
   return await prisma.post.update({
     where: {
       id,
