@@ -17,7 +17,7 @@ type Post = {
 };
 
 type UpdatedPost = {
-  tweet: string;
+  tweet?: string;
   isEdit: boolean;
   tweetImg?: {
     update?: TweetImg;

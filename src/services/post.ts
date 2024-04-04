@@ -55,7 +55,7 @@ export const deleteAllPosts = async (userId: string) => {
 export const updatePost = async (
   id: string,
   data: UpdatedPost,
-  image: Express.Multer.File
+  image?: Express.Multer.File
 ) => {
   const post = await getPost(id);
 

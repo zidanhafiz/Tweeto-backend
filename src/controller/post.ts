@@ -87,13 +87,37 @@ router.post('/', upload.single('image'), async (req: Request, res: Response) => 
 router.delete('/:id', isAuthor, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
     const post = await getPost(id);
+
+    if (post.tweetImg) {
+      await deleteTweetImg(post.tweetImg);
+    }
 
     const deletedPost = await deletePost(id);
 
-    await deleteTweetImg(post.tweetImg);
+    return res.status(201).send({
+      message: `Success delete`,
+      post: deletedPost,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(400);
+  }
+});
 
-    return res.status(201).send(deletedPost);
+router.delete('/:id/tweetImg', isAuthor, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const post = await getPost(id);
+
+    if (!post.tweetImg) {
+      return res.sendStatus(404);
+    }
+
+    const deletedImg = await deleteTweetImg(post.tweetImg);
+
+    return res.status(201).send(deletedImg);
   } catch (error) {
     console.error(error);
     return res.sendStatus(400);
@@ -111,9 +135,12 @@ router.patch(
       const image = req.file;
 
       const post: UpdatedPost = {
-        tweet,
         isEdit: true,
       };
+
+      if (tweet) {
+        post.tweet = tweet
+      }
 
       const updatedPost = await updatePost(id, post, image);
 

@@ -1,4 +1,4 @@
-import { storage } from '@/db';
+import { prisma, storage } from '@/db';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { nanoid } from 'nanoid';
 
@@ -30,6 +30,12 @@ export const deleteTweetImg = async (tweetImg: TweetImg) => {
 
   try {
     await deleteObject(profileRef);
+
+    return await prisma.tweetImg.delete({
+      where: {
+        id: tweetImg.id,
+      },
+    });
   } catch (error) {
     console.error(error);
     throw Error(error);
